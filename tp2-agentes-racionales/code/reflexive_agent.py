@@ -19,7 +19,6 @@ class Position:
     __rmul__ = __mul__
 
 Section = Position
-Direction = Position
 
 class Perception:
     def __init__(self, pos: Position = None, is_dirty: bool = False, actions_remaining: int = 0, 
@@ -45,7 +44,7 @@ class ReflexAgent(BaseAgent):
                         replay_file, cell_size, fps, auto_exit_on_finish, live_stats)
         
     def get_strategy_description(self) -> str:
-        return "Recorre la grilla sin repetir celdas, de manera recursiva, sin utilizar memoria ni percepción global"
+        return "Recorre la grilla de manera recursiva, siguiendo un patrón de barrido en sentido horario, sin utilizar memoria ni percepción global"
     
     def think(self) -> bool:
         if not self.is_connected():
@@ -58,6 +57,8 @@ class ReflexAgent(BaseAgent):
         if env.is_finished:
             return False
         
+        # Debemos usar idle() para balancear los casos en que no limpiamos, así
+        # podemos calcular la posición en el patrón a partir de las acciones consumidas
         is_cleaning_stage = env.actions_consumed % 2 == 0
         if is_cleaning_stage:
             if env.is_dirty:
@@ -68,8 +69,12 @@ class ReflexAgent(BaseAgent):
         solution = self._solve_section(env.pos, env.cells_cleaned)
         return solution()
     
-    # Resolución recursiva
+    # Resolución recursiva, resuelve en un patrón de barrido de sentido horario, a diferentes escalas
+    # Utiliza la cantidad de acciones consumidas y la posición para saber en qué etapa se encuentra del patrón
     def _solve_section(self, rel_pos, section_cleaned_cells, section_size=128, desired_exit_dir=None):
+        if desired_exit_dir is None:
+            desired_exit_dir = self.idle
+        
         if section_size == 1:
             return desired_exit_dir
         
@@ -96,7 +101,9 @@ class ReflexAgent(BaseAgent):
 
         return self._solve_section(pos_rel_2_current_subsection, current_subsection_cleaned_cells, subsection_size, subsection_exit_dir)
     
-    def _is_on_proper_side(self, exit_dir: Direction, subsection: Section):
+    # Devuelve si estamos en el lugar correcto de una sección
+    # tal que podamos salir por el lado deseado
+    def _is_on_proper_side(self, exit_dir, subsection: Section):
         if exit_dir == self.right and subsection.x == 1:
             return True
         if exit_dir == self.left and subsection.x == 0:
@@ -120,7 +127,7 @@ class ReflexAgent(BaseAgent):
             return self.left
 
     # Esto es solamente para simplificar la sintaxis de acceso a los datos del entorno
-    # Se guardan en una clase tal que podamos acceder con notación de punto (e.g. env.pos.x)
+    # Se guardan en una clase tal que podamos acceder con notación de punto (e.g. env.pos.x o env.is_dirty)
     def get_perception(self) -> Perception:
         perception = super().get_perception()
         if not perception or perception.get('is_finished', True):
@@ -135,16 +142,6 @@ class ReflexAgent(BaseAgent):
         env.is_finished = perception.get('is_finished')
 
         return env
-    
-    def _solution_to_command_mapper(self, solution):
-        commands = {
-            Direction( 1, 0): self.right,
-            Direction( 0,-1): self.up,
-            Direction(-1, 0): self.left,
-            Direction( 0, 1): self.down,
-            None: self.idle
-        }
-        return commands[solution]
     
 def run_example_agent_simulation(size_x: int = 8, size_y: int = 8, 
                                 dirt_rate: float = 0.3, 
