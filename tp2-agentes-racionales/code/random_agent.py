@@ -18,7 +18,7 @@ class RandomAgent(BaseAgent):
         super().__init__(server_url, "RandomAgent", enable_ui, record_game, 
                         replay_file, cell_size, fps, auto_exit_on_finish, live_stats)
         
-        # Estado interno para movimiento circular
+        # Acciones posibles
         self.possible_actions = [self.up, self.right, self.down, self.left, self.idle, self.suck]
     
     def get_strategy_description(self) -> str:
