@@ -50,7 +50,7 @@ class ReflexAgent(BaseAgent):
         if not self.is_connected():
             return False
         
-        env = self.get_perception()
+        env = self.get_environment()
         if not env:
             return False
         
@@ -128,8 +128,8 @@ class ReflexAgent(BaseAgent):
 
     # Esto es solamente para simplificar la sintaxis de acceso a los datos del entorno
     # Se guardan en una clase tal que podamos acceder con notación de punto (e.g. env.pos.x o env.is_dirty)
-    def get_perception(self) -> Perception:
-        perception = super().get_perception()
+    def get_environment(self) -> Perception:
+        perception = self.get_perception()
         if not perception or perception.get('is_finished', True):
             return False
         
