@@ -44,7 +44,7 @@ class Grid:
         if isinstance(key, Vec2):
             return key.y, key.x
         elif isinstance(key, tuple) and len(key) == 2:
-            return key  # already (y, x)
+            return key
         else:
             raise TypeError("Grid index must be a Vec2 or a (y, x) tuple")
 
@@ -192,10 +192,12 @@ class RandomSearch(Algorithm):
             self._actions.append(action)
             self._actions_count += 1
             self._actions_cost += self._cost_fn(action)
+
+            new_pos = self._pos + action
+            if self._is_valid_position(new_pos):
+                self._pos = new_pos
             
-            new_pos = (self._pos + action).clamp_to_grid(self._grid)
-            self._path.append(new_pos)
-            self._pos = new_pos
+            self._path.append(self._pos)
 
 
 class BFS(Algorithm):
@@ -243,43 +245,51 @@ class DFS(Algorithm):
     def _calculate_solution(self):
         visited = set()
         came_from = {}
-        
-        stack = [(self._start, 0, 0)]
-        
+
+        # store parent & action in the stack entry; start has parent None
+        stack = [(self._start, 0, 0, None, None)]
+
         while stack:
-            current, depth, path_length = stack.pop()
-            
+            current, depth, path_length, parent, parent_action = stack.pop()
+
             if current in visited:
                 continue
-            
+
+            # when we actually visit the node, set came_from from the parent we popped with
+            if parent is not None:
+                came_from[current] = (parent, parent_action)
+
             if self._depth_limit is not None and depth > self._depth_limit:
                 continue
-            
+
             if path_length > self._max_actions:
                 continue
-            
+
             visited.add(current)
             self._explored_states += 1
-            
+
             if current == self._goal:
                 self._path, self._actions = self._reconstruct_path(came_from, self._goal)
                 self._success = True
                 self._actions_count = len(self._actions)
                 self._actions_cost = sum(self._cost_fn(action) for action in self._actions)
                 return
-            
+
             if self._grid[current] == 'H':
                 continue
-            
+
             for action in reversed(ACTIONS):
                 neighbor = current + action
-                
-                if (self._is_valid_position(neighbor) and 
-                    neighbor not in visited and 
-                    self._grid[neighbor] != 'H'):
-                    
-                    came_from[neighbor] = (current, action)
-                    stack.append((neighbor, depth + 1, path_length + 1))
+
+                if not self._is_valid_position(neighbor) or neighbor in visited or self._grid[neighbor] == 'H':
+                    continue
+
+                # optionally avoid pushing nodes that would exceed the depth limit
+                if self._depth_limit is not None and depth + 1 > self._depth_limit:
+                    continue
+
+                stack.append((neighbor, depth + 1, path_length + 1, current, action))
+
 
 
 class UCS(Algorithm):
