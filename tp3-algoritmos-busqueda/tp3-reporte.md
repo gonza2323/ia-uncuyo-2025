@@ -19,6 +19,7 @@ Los algoritmos evaluados fueron:
 
 Los entornos utilizados tenían un tamaño de 100 x 100, con una probabilidad de 0.92 de que una celda sea transitable, y 0.08 de que sea un obstáculo. Al agente se le configuró una vida máxima de 1000 acciones.
 
+Para el caso de A*, se utilizaron dos heurísitcas, una distinta para cada escenario. Para el escenario 1, se utilizó la distancia Manhattan, que es la suma de la distancia en x, y la distancia en y. Esta heurística es admisible ya que es menor o igual al camino más corto posible, dado el entorno en el que se trabajo, que solo permite movimientos verticales y horizontales, y no en diagonal. Para el escenario 2, se utilizó una modificación de la distancia manhattan, en la cual la distancia en y es multiplicada por 10, y luego se le suma la distancia en x. Esta heurística también es menor o igual al camino de menor costo.
 
 ## 2. Resultados
 
