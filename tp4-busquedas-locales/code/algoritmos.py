@@ -175,11 +175,13 @@ class SimulatedAnnealing(BaseAlgorithm):
         super().__init__(name)
         self._current_solution = None
         self._current_h = None
+        self._initial_temp = initial_temp
         self._temp = initial_temp
         self._cooling_rate = cooling_rate
         self._stop_temp = stop_temp
 
     def _start(self):
+        self._temp = self._initial_temp
         self._current_solution = self._generate_random_solution()
         self._current_h = self._h_func(self._current_solution)
         return {
@@ -214,3 +216,82 @@ class SimulatedAnnealing(BaseAlgorithm):
             'explored_states': 1,
             'should_stop': should_stop
         }
+
+
+class GeneticAlgorithm(BaseAlgorithm):
+    def __init__(self, name='genetic_algorithm', population_size=50, mutation_rate=0.1):
+        super().__init__(name)
+        self._population_size = population_size
+        self._mutation_rate = mutation_rate
+        self._population = []
+
+    def _start(self):
+        self._population = [self._generate_random_solution() for _ in range(self._population_size)]
+        best = min(self._population, key=self._h_func)
+        return {
+            'best_solution': best,
+            'best_h': self._h_func(best),
+            'explored_states': self._population_size
+        }
+
+    def _step(self):
+        # Mantenemos al 10% mejor (elitismo)
+        sorted_pop = sorted(self._population, key=self._h_func)
+        elite_count = max(1, len(self._population) // 10)
+        elite = sorted_pop[:elite_count]
+
+        # Partially Mapped Crossover
+        children = []
+        while len(children) + len(elite) < self._population_size:
+            # Elegimos los padres por torneo
+            parent1 = self._tournament_selection(k=3)
+            parent2 = self._tournament_selection(k=3)
+            while parent2 == parent1:
+                parent2 = self._tournament_selection(k=3)
+
+            # Crossover
+            child = self._pmx(parent1, parent2)
+            children.append(child)
+
+        self._population = elite + children
+
+        # Mutaciones
+        for i in range(len(self._population)):
+            if self._rng.random() < self._mutation_rate:
+                a, b = self._rng.sample(range(self._size), 2)
+                self._population[i][a], self._population[i][b] = self._population[i][b], self._population[i][a]
+
+        best = min(self._population, key=self._h_func)
+        best_h = self._h_func(best)
+
+        return {
+            'best_solution': best,
+            'best_h': best_h,
+            'explored_states': self._population_size,
+        }
+    
+    def _tournament_selection(self, k=3):
+            candidates = self._rng.sample(self._population, k)
+            return min(candidates, key=self._h_func)
+
+    def _pmx(self, parent1, parent2):
+        size = self._size
+        cx1, cx2 = sorted(self._rng.sample(range(size + 1), 2))
+        child = [None] * size
+
+        # Genes padre 1
+        child[cx1:cx2] = parent1[cx1:cx2]
+
+        # Mapeo
+        mapping = {parent1[i]: parent2[i] for i in range(cx1, cx2)}
+
+        # Resto de los genes (padre 2)
+        for i in range(size):
+            if cx1 <= i < cx2:
+                continue
+            val = parent2[i]
+            while val in mapping:
+                val = mapping[val]
+            child[i] = val
+
+        return child
