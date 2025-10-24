@@ -25,8 +25,10 @@ class BaseAlgorithm:
         start_time = time.time()
         
         results = self._start()
-        self._update_stats(results)
-        if (debug): self._print_solution(self._best_solution)
+
+        if (results):
+            self._update_stats(results)
+            if (debug): self._print_solution(self._best_solution)
 
         while (self._explored_states < self._max_states and not self._success and not self._should_stop):
             results = self._step()
@@ -115,10 +117,19 @@ class BaseAlgorithm:
             print(line)
         print()
 
+    def get_name(self):
+        return self._name
+
 
 class RandomAlgorithm(BaseAlgorithm):
     def __init__(self, name='random'):
         super().__init__(name)
+
+    def _start(self):
+        return {
+            'solution': self._generate_random_solution(),
+            'explored_states': 1
+        }
 
     def _step(self):
         return {
@@ -219,7 +230,7 @@ class SimulatedAnnealing(BaseAlgorithm):
 
 
 class GeneticAlgorithm(BaseAlgorithm):
-    def __init__(self, name='genetic_algorithm', population_size=50, mutation_rate=0.1):
+    def __init__(self, name='genetic_algorithm', population_size=50, mutation_rate=0.2):
         super().__init__(name)
         self._population_size = population_size
         self._mutation_rate = mutation_rate
