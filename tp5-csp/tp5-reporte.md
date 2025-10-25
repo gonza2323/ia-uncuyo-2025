@@ -95,3 +95,176 @@ Si comenzamos la revisión desde un nodo en particular, como no hay ciclos, nunc
 En cada revisión de un arco, hay que revisar que para todos los elementos del dominio de un nodo existe uno en el otro nodo que cumpla la restricción. Entonces cada revisión tiene un costo de $O(d^2)$, donde d es el tamaño del dominio más grande del problema.
 
 Entonces, la complejidad total es de $O(nd^2)$.
+
+
+## Evaluación de desempeño de los algoritmos
+
+
+## 1. Introducción
+
+Se comparó el desempeño de distintos algoritmos de búsqueda local para resolver el problema de las n reinas. Cada uno fue evaluado 50 veces para distintos tamaños de tablero (4, 8, 10, 12, 15).
+
+Los algoritmos evaluados fueron:
+
+1. Búsqueda aleatoria (Random)
+2. Hill climbing (HC)
+3. Simulated annealing (SA)
+4. Algoritmo genético (GA)
+5. CSP - Backtracking (CSP-BT)
+6. CSP - Forward Checking (CSP-FC)
+
+Las soluciones fueron evaluadas utilizando una función de costo $H(e)$, que contabiliza la cantidad de pares de reinas amenazadas para una solución $e$.
+
+
+## 2. Resultados
+
+### 2.1 Tasa de obtención de solución óptima, por algoritmo y tamaño de tablero
+
+La siguiente tabla muestra el porcentaje de pruebas en las que cada algoritmo llegó a una solución óptima (H=0), para cada tamaño de tablero.
+
+| algorithm_name   |   4 |   8 |   10 |   12 |   15 |
+|:-----------------|----:|----:|-----:|-----:|-----:|
+| Random           | 100 | 100 |   94 |   26 |    0 |
+| HC               |  86 |  34 |    2 |    4 |    0 |
+| SA               | 100 | 100 |   92 |   86 |   72 |
+| GA               | 100 | 100 |   90 |   88 |   68 |
+| CSP-BT           | 100 | 100 |  100 |  100 |  100 |
+| CSP-FC           | 100 | 100 |  100 |  100 |  100 |
+
+Los siguientes gráficos muestran estos resultados para algunos tamaños de tablero (ver anexo para los gráficos para todos los tamaños de tablero).
+
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 4"](./images/win_rate_size4.png)
+
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 15"](./images/win_rate_size15.png)
+
+### Análisis
+
+Podemos ver que ambas versiones de CSP logran obtener la solución óptima en todas las pruebas, independientemente del tamaño del tablero, a diferencia de los algoritmos analizados en el TP 4.
+
+Esto se debe a que CSP garantiza encontrar una solución si la misma existe (siempre que no se supere el límite de estados máximo, lo cuál no ocurrió nunca), y el problema de las n reinas siempre tiene solución para tableros de tamaño mayor a 3.
+
+
+### 2.2 Valor de H() promedio obtenido, por algoritmo y tamaño de tablero
+
+La siguiente tabla muestra el valor de H() promedio obtenido por cada algoritmo, para cada tamaño de tablero.
+
+| algorithm_name   | 4             | 8             | 10            | 12            | 15            |
+|:-----------------|:--------------|:--------------|:--------------|:--------------|:--------------|
+| Random           | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.060 ± 0.240 | 0.740 ± 0.443 | 1.560 ± 0.501 |
+| HC               | 0.140 ± 0.351 | 1.120 ± 1.239 | 1.920 ± 1.426 | 2.580 ± 1.513 | 4.120 ± 2.154 |
+| SA               | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.080 ± 0.274 | 0.140 ± 0.351 | 0.280 ± 0.454 |
+| GA               | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.100 ± 0.303 | 0.120 ± 0.328 | 0.320 ± 0.471 |
+| CSP-BT           | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 |
+| CSP-FC           | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 |
+
+Los siguientes gráficos muestran estos resultados para algunos tamaños de tablero (ver anexo para los gráficos para todos los tamaños de tablero).
+
+!["H() promedio obtenido por algoritmo, tamaño 4"](./images/H_size4.png)
+!["H() promedio obtenido por algoritmo, tamaño 8"](./images/H_size8.png)
+!["H() promedio obtenido por algoritmo, tamaño 15"](./images/H_size15.png)
+
+### Análisis
+
+En coincidencia con el resultado anterior, vemos que ambas implementaciones de CSP logran un valor de H() = 0 en todas las pruebas, es decir, lograron encontrar una solución óptima en cada prueba.
+
+
+
+### 2.3 Tiempo de ejecución por algoritmo y tamaño de tablero
+
+La siguiente tabla muestra el tiempo de ejecución promedio para cada algoritmo, para cada tamaño de tablero.
+
+| algorithm_name   | 4             | 8             | 10            | 12            | 15            |
+|:-----------------|:--------------|:--------------|:--------------|:--------------|:--------------|
+| Random           | 0.000 ± 0.000 | 0.003 ± 0.003 | 0.029 ± 0.026 | 0.108 ± 0.051 | 0.175 ± 0.033 |
+| HC               | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.001 ± 0.000 | 0.001 ± 0.000 | 0.003 ± 0.001 |
+| SA               | 0.000 ± 0.000 | 0.005 ± 0.004 | 0.016 ± 0.007 | 0.020 ± 0.006 | 0.037 ± 0.012 |
+| GA               | 0.000 ± 0.000 | 0.011 ± 0.013 | 0.099 ± 0.165 | 0.187 ± 0.222 | 0.505 ± 0.353 |
+| CSP-BT           | 0.000 ± 0.000 | 0.000 ± 0.001 | 0.001 ± 0.000 | 0.001 ± 0.001 | 0.002 ± 0.003 |
+| CSP-FC           | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.000 ± 0.000 | 0.001 ± 0.001 |
+
+Los siguientes gráficos muestran estos resultados para algunos tamaños de tablero (ver anexo para los gráficos para todos los tamaños de tablero).
+
+!["Tiempo de ejecución por algoritmo, tamaño 4"](./images/time_size4.png)
+!["Tiempo de ejecución por algoritmo, tamaño 10"](./images/time_size10.png)
+!["Tiempo de ejecución por algoritmo, tamaño 15"](./images/time_size15.png)
+
+### Análisis
+
+En todas las pruebas, ambas implementaciones de CSP no solo hallan la solución óptima, sino que lo hacen en 1 ms o menos. Esto es un orden de magnitud mejor que SA, y varios órdenes de magnitud mejor que GA, cuando éstos ni siquiera llegan a un 75% de soluciones óptimas.
+
+La implementación de CSP-FC es significativamente más rápida que CSP-BT, debido al recorte de ramas que permite la técnica de forward checking. De todas maneras, para este problema, ambas implementaciones resultan muy rápidas.
+
+
+### 2.4 Cantidad de estados explorados por algoritmo y tamaño de tablero
+
+La siguiente tabla muestra la cantidad de estados explorados en promedio para cada algoritmo, para cada tamaño de tablero.
+
+| algorithm_name   | 4               | 8                 | 10                  | 12                  | 15                  |
+|:-----------------|:----------------|:------------------|:--------------------|:--------------------|:--------------------|
+| Random           | 10.340 ± 12.280 | 477.620 ± 405.214 | 3457.220 ± 2989.338 | 8307.540 ± 3143.780 | 10000.000 ± 0.000   |
+| HC               | 9.040 ± 3.758   | 54.760 ± 7.673    | 91.000 ± 0.000      | 131.680 ± 9.334     | 211.000 ± 0.000     |
+| SA               | 12.560 ± 13.455 | 336.440 ± 256.361 | 880.980 ± 296.986   | 987.320 ± 242.204   | 1121.040 ± 206.326  |
+| GA               | 52.000 ± 9.897  | 322.000 ± 331.533 | 1895.000 ± 3019.178 | 2781.000 ± 3229.107 | 5425.000 ± 3833.383 |
+| CSP-BT           | 10.280 ± 5.739  | 47.680 ± 49.584   | 92.240 ± 81.967     | 167.960 ± 297.433   | 296.280 ± 451.159   |
+| CSP-FC           | 6.200 ± 1.278   | 17.700 ± 10.634   | 42.420 ± 33.905     | 46.240 ± 57.596     | 63.740 ± 61.473     |
+
+Los siguientes gráficos muestran estos resultados para algunos tamaños de tablero (ver anexo para los gráficos para todos los tamaños de tablero).
+
+!["Cantidad de estados explorados por algoritmo, tamaño 4"](./images/states_size4.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 8"](./images/states_size8.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 12"](./images/states_size12.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 15"](./images/states_size15.png)
+
+### Análisis
+
+Se observa que ambas implementaciones de CSP son las que menos estados exploran en comparación a los demás algoritmos del TP 4. Esta diferencia se hace aún mayor a medida que aumenta el tamaño del tablero, a pesar de que ambas versiones de CSP son las únicas que logran resolver todas las pruebas para el tamaño más grande tablero.
+
+La implementación de CSP-FC recorre muchos menos nodos que CSP-BT, debido al recorte de ramas que permite la técnica de forward checking. De todas maneras, para este problema, ambas implementaciones son muy eficientes y recorren pocos estados.
+
+
+## 3. Conclusión
+
+Se puede concluir que CSP-BT y CSP-FC son, según todas las métricas analizadas, la mejor opción para resolver el problema de las n reinas, especialmente a medida que aumenta el tamaño del tablero, mientras que los algoritmos analizados en el TP 4 son significativamente peores.
+
+Ambas implementaciones de CSP fueron las únicas que fueron capaces de resolver todas las pruebas, incluso para el tablero más grande. Simulated Annealing y el algoritmo genético les siguen muy por detrás, con tasas de resolución de 72% y 68%, respectivamente. Además, ambas versiones de CSP lograron esto en un menor tiempo que todos los demás algoritmos, para todos los tamaños de tablero, pero la diferencia fue especialmente grande para tableros de mayor tamaño.
+
+Esto se debe a que CSP garantiza encontrar una solución si la misma existe (siempre que no se supere el límite de estados máximo, lo cuál no ocurrió nunca), y el problema de las n reinas siempre tiene solución para tableros de tamaño mayor a 3.
+
+La implementación de CSP-FC fue considerablemente más rápida y exploró menos estados que la de CSP-BT. Esto se debe al recorte de ramas que permite la técnica de forward checking. De todas maneras, para este problema, ambas implementaciones resultan muy eficientes.
+
+El peor algoritmo fue Hill Climbing, debido a que encuentra mínimos locales muy rápidamente, de los cuáles le es imposible salir, llegando a soluciones muy poco óptimas (H muy elevado), mientras que Simulated Annealing y el Algoritmo Genético permiten explorar soluciones peores a la mejor ya encontrada, permitiendo así explorar una mayor parte del espacio de soluciones. Aún así, ninguno de estos dos logra resolver siempre todas las pruebas para el mayor tamaño de tablero, a diferencia de CSP.
+
+
+## 4. Anexo
+
+Comparación de tasa de obtención de solución óptima por algoritmo, para cada tamaño de tablero.
+
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 4"](./images/win_rate_size4.png)
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 8"](./images/win_rate_size8.png)
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 10"](./images/win_rate_size10.png)
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 12"](./images/win_rate_size12.png)
+!["Tasa de obtención de solución óptima por algoritmo, tamaño 15"](./images/win_rate_size15.png)
+
+Comparación de valor de H() promedio obtenido por algoritmo, para cada tamaño de tablero.
+
+!["H() promedio obtenido por algoritmo, tamaño 4"](./images/H_size4.png)
+!["H() promedio obtenido por algoritmo, tamaño 8"](./images/H_size8.png)
+!["H() promedio obtenido por algoritmo, tamaño 10"](./images/H_size10.png)
+!["H() promedio obtenido por algoritmo, tamaño 12"](./images/H_size12.png)
+!["H() promedio obtenido por algoritmo, tamaño 15"](./images/H_size15.png)
+
+Comparación de tiempo de ejecución por algoritmo, para cada tamaño de tablero.
+
+!["Tiempo de ejecución por algoritmo, tamaño 4"](./images/time_size4.png)
+!["Tiempo de ejecución por algoritmo, tamaño 8"](./images/time_size8.png)
+!["Tiempo de ejecución por algoritmo, tamaño 10"](./images/time_size10.png)
+!["Tiempo de ejecución por algoritmo, tamaño 12"](./images/time_size12.png)
+!["Tiempo de ejecución por algoritmo, tamaño 15"](./images/time_size15.png)
+
+Comparación de cantidad de estados explorados por algoritmo, para cada tamaño de tablero.
+
+!["Cantidad de estados explorados por algoritmo, tamaño 4"](./images/states_size4.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 8"](./images/states_size8.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 10"](./images/states_size10.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 12"](./images/states_size12.png)
+!["Cantidad de estados explorados por algoritmo, tamaño 15"](./images/states_size15.png)
