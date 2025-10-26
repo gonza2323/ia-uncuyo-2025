@@ -22,8 +22,6 @@ Hay dos posibles criterios que podríamos usar para responder esta pregunta. Uno
 
 El primer criterio nos dice la cantidad de árboles peligroso, mientras que el segundo nos dice, dado un árbol cualquiera de la sección, qué tan probable es que sea peligroso.
 
-También podría considerarse la cantidad de árboles peligrosos por km<sup>2</sup>, pero no tenemos el dato de área para cada sección.
-
 El siguiente gráfico muestra la frecuencia absoluta de árboles con inclinación peligrosa por sección.
 
 !["Frecuencia absoluta de árboles peligrosos por sección"](./images/seccion_peligrosa_absoluta.png)
