@@ -6,7 +6,7 @@
 
 ### Ejercicios 4, 5 y 6
 
-#### Clasificador aleatorio
+### Clasificador aleatorio
 
 **Matriz de confusión**
 
@@ -27,7 +27,7 @@ Sensitivity = 49.51%
 Specificity = 49,75%
 
 
-#### Clasificador por clase mayoritaria
+### Clasificador por clase mayoritaria
 
 **Matriz de confusión**
 
